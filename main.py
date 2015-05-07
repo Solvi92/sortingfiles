@@ -11,27 +11,55 @@ from math import radians, cos, sin, asin, sqrt, pi
 import os
 import shutil
 
-def sort(fileName):
-    print(fileName)
+def sort(path, fileName):
+    originalFileName = fileName
+    if fileName.endswith('.avi') \
+            or fileName.endswith('.mp4') \
+            or fileName.endswith('.mkv'):
+        fileName = fileName.replace('.avi', ' ')
+        fileName = fileName.replace('.rm', ' ')
+        fileName = fileName.replace('.srt', ' ')
+        fileName = fileName.replace('.mp4', ' ')
+        fileName = fileName.replace('.mkv', ' ')
+        fileName = fileName.replace('.', ' ')
+        fileName = fileName.lower()
+        fileName = fileName.replace('sample', ' ')
+        fileName = fileName.replace('-', '')
+        fileName = fileName.strip()
+        fileName = fileName.replace('_',' ')
+
 
 def sortTv(showName):
     pass
 
-def sortMovie(movieName):
-    pass
-
 def sortAll():
     homeDir = os.getcwd()
-    os.mkdir(os.path.join(homeDir, 'downloads', 'RecycleBin'))
-    for root, dir, files in os.walk(os.path.join(homeDir, 'downloads')):
+    folderToSort = 'downloads'
+    folderToSortFullPath = os.path.join(homeDir, folderToSort)
+    recyPath = os.path.join(folderToSortFullPath, '_RecycleBin')
+    sortedFilesPath = os.path.join(folderToSortFullPath, '_SortedFiles')
+
+    if not os.path.exists(recyPath):
+        os.mkdir(recyPath)
+    if not os.path.exists(sortedFilesPath):
+        os.mkdir(sortedFilesPath)
+
+    for root, dir, files in os.walk(folderToSortFullPath):
+        if root.startswith(sortedFilesPath) or root.startswith(recyPath):
+            continue
         for file in files:
-            if file.endswith('.mp4') or file.endswith('.avi') \
+            if not file.endswith('.mp4') or file.endswith('.avi') \
                     or file.endswith('.mkv') or file.endswith('.srt') \
                     or file.endswith('.rm'):
-                sortTv(file)
-            else :
                 #This should go the the Recycle Bin folder
-                shutil.move(os.path.join(root, file), os.path.join(homeDir,'downloads', 'RecycleBin', file))
+                shutil.move(os.path.join(root, file), os.path.join(recyPath, file))
+
+    for root, dir, files in os.walk(folderToSortFullPath):
+        if root.startswith(sortedFilesPath) or root.startswith(recyPath):
+            continue
+        print(root)
+        for file in files:
+                sort(folderToSortFullPath, file)
 
 def main():
     print('###########################################\n'
