@@ -21,12 +21,17 @@ def sortMovie(movieName):
     pass
 
 def sortAll():
-    for r, d, f in os.walk(os.getcwd()):
-        for i in f:
-            print(r)
-            if i.endswith('.mp4') or i.endswith('.avi') or i.endswith('.mkv') or i.endswith('.srt'):
-                sortTv(i)
-
+    homeDir = os.getcwd()
+    os.mkdir(os.path.join(homeDir, 'downloads', 'RecycleBin'))
+    for root, dir, files in os.walk(os.path.join(homeDir, 'downloads')):
+        for file in files:
+            if file.endswith('.mp4') or file.endswith('.avi') \
+                    or file.endswith('.mkv') or file.endswith('.srt') \
+                    or file.endswith('.rm'):
+                sortTv(file)
+            else :
+                #This should go the the Recycle Bin folder
+                shutil.move(os.path.join(root, file), os.path.join(homeDir,'downloads', 'RecycleBin', file))
 
 def main():
     print('###########################################\n'
@@ -40,7 +45,8 @@ def main():
           '#      sort after filename                #\n'
           '#                                         #\n'
           '###########################################\n')
-    inp = input('Sort or filename \n')
+    #inp = input('Sort or filename \n')
+    inp = 'sort'
     if inp == 'sort':
         sortAll()
     else:
