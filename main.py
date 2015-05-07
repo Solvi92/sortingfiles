@@ -11,6 +11,14 @@ from math import radians, cos, sin, asin, sqrt, pi
 import os
 import shutil
 
+#globals
+homeDir = os.getcwd()
+folderToSort = 'downloads'
+folderToSortFullPath = os.path.join(homeDir, folderToSort)
+recyPath = os.path.join(folderToSortFullPath, '_RecycleBin')
+sortedFilesPath = os.path.join(folderToSortFullPath, '_SortedFiles')
+#globals end
+
 def sort(path, fileName):
     originalFileName = fileName
     if fileName.endswith('.avi') \
@@ -28,38 +36,55 @@ def sort(path, fileName):
         fileName = fileName.strip()
         fileName = fileName.replace('_',' ')
 
+        regex = re.search((r'([\w\s]+)+s(\d+)\s*e\d+ '), fileName)
+        if regex:
+            showName = regex.group(1)
+            season = regex.group(2)
+            showName.title()
+            showName = showName.strip()
+            showFolder = os.path.join(sortedFilesPath, showName)
+            if os.path.exists(showFolder):
+                #add this show to existing folder in the right season
+                if os.path.exists(os.path.join(showFolder, 'Season %s'% season)):
+                    shutil.move(os.path.join(path, originalFileName), os.path.join(showFolder, 'Season %s'% season))
+                else:
+                    print(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
+                    os.makedirs(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
+            else:
+                #make a new folder and add the show to it in the right season
+                os.makedirs(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
+        else: print('regex did not find anything for the file:', fileName)
 
 def sortTv(showName):
     pass
 
 def sortAll():
-    homeDir = os.getcwd()
-    folderToSort = 'downloads'
-    folderToSortFullPath = os.path.join(homeDir, folderToSort)
-    recyPath = os.path.join(folderToSortFullPath, '_RecycleBin')
-    sortedFilesPath = os.path.join(folderToSortFullPath, '_SortedFiles')
-
+    #making _RecycleBin folder and the _SortedFiles folder
     if not os.path.exists(recyPath):
         os.mkdir(recyPath)
     if not os.path.exists(sortedFilesPath):
         os.mkdir(sortedFilesPath)
 
+    #putting files we don't want in the _RecycleBin folder
     for root, dir, files in os.walk(folderToSortFullPath):
         if root.startswith(sortedFilesPath) or root.startswith(recyPath):
             continue
         for file in files:
-            if not file.endswith('.mp4') or file.endswith('.avi') \
+            if file.endswith('.mp4') or file.endswith('.avi') \
                     or file.endswith('.mkv') or file.endswith('.srt') \
-                    or file.endswith('.rm'):
-                #This should go the the Recycle Bin folder
+                    or file.endswith('.rm') \
+                    or file.endswith('.wmv'):
+                continue
+            else:
+                #This goes the the Recycle Bin folder
                 shutil.move(os.path.join(root, file), os.path.join(recyPath, file))
 
+    #sorting files we want and putting them in the _SortedFiles folder
     for root, dir, files in os.walk(folderToSortFullPath):
         if root.startswith(sortedFilesPath) or root.startswith(recyPath):
             continue
-        print(root)
         for file in files:
-                sort(folderToSortFullPath, file)
+            sort(folderToSortFullPath, file)
 
 def main():
     print('###########################################\n'
@@ -79,7 +104,7 @@ def main():
         sortAll()
     else:
         sort(inp)
-
+    print('Done')
 
 
 main()
