@@ -11,20 +11,24 @@ from math import radians, cos, sin, asin, sqrt, pi
 import os
 import shutil
 
-def sortAll():
-    for r, d, f in os.walk(pathToFile):
-        for i in f:
-            if i.endswith('.mp4') or i.endswith('.avi') or i.endswith('.mkv'):
-                pass
-
 def sort(fileName):
-    pass
+    print(fileName)
+
 def sortTv(showName):
     pass
+
 def sortMovie(movieName):
     pass
 
-def main(pathToFile):
+def sortAll():
+    for r, d, f in os.walk(os.getcwd()):
+        for i in f:
+            print(r)
+            if i.endswith('.mp4') or i.endswith('.avi') or i.endswith('.mkv') or i.endswith('.srt'):
+                sortTv(i)
+
+
+def main():
     print('###########################################\n'
           '#                                         #\n'
           '#      Welcome to Super Sorter 3000       #\n'
@@ -44,4 +48,4 @@ def main(pathToFile):
 
 
 
-main('C:\\Users\\Lenovo\\Desktop\\downloads')
+main()
