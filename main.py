@@ -204,12 +204,11 @@ def main():
     global duplicatesPath
     global musicPath
 
-    location = 1
-    while location != 0:
-        location = input('-> Input the complete path of the folder to sort or 0 to quit \n')
+    superSorter = 1
+    while superSorter != 0:
+        location = input('-> Input the complete path of the folder to sort\n')
         while not os.path.exists(os.path.abspath(location)):
             location = input('-> Must be a valid path, please try again \n')
-
         folderToSortFullPath = location
         recyPath = os.path.join(folderToSortFullPath, '_RecycleBin')
         sortedFilesPath = os.path.join(folderToSortFullPath, '_SortedFiles')
@@ -230,5 +229,8 @@ def main():
             sortInp(inp)
         rmAllEmptyFolders()
         print('Sorting done')
-
+        superSorter = input('Type 0 if you want to quit else type 1 \n')
+        while superSorter != '1' and superSorter != '0':
+            superSorter = input('Wrong input please type 0 if you want to quit or type 1 to continue \n')
+        superSorter = int(superSorter)
 main()
