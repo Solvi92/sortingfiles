@@ -73,6 +73,7 @@ def sortAll():
     for root, dir, files in os.walk(folderToSortFullPath):
         if root.startswith(sortedFilesPath) or root.startswith(recyPath) or root.startswith(duplicatesPath):
             continue
+        print(dir)
         for file in files:
             if file.endswith('.mp4') or file.endswith('.avi') \
                     or file.endswith('.mkv') or file.endswith('.srt') \
