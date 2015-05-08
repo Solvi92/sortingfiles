@@ -56,15 +56,15 @@ def sort(path, fileName):
         if regex: # TV shows with the regex 'TV Show Name s10 e10'
             moveTvShow(regex, path, originalFileName)
         else:
-            regex = re.search((r'([\w\s]+).*(\d+)x\d+'), fileName)
+            regex = re.search((r'([\w\s]+) .*(\d+)x\d+'), fileName)
             if regex:# TV shows with the regex 'TV Show Name [10x10]'
                 moveTvShow(regex, path, originalFileName)
             else:
-                regex = re.search((r'([\w\s]+)\s+(\d)\d\d\s*'), fileName)
+                regex = re.search((r'([\w\s]+)\s+(\d)\d\d\s+'), fileName)
                 if regex:
                     moveTvShow(regex, path, originalFileName)
                 else:
-                    regex = re.search((r'([\w\s]+)\s+s(\d+)\s*e'), fileName)
+                    regex = re.search((r'([\w\s]+)\s+s(\d+)\s*'), fileName)
                     if regex:
                         moveTvShow(regex, path, originalFileName)
                     else:
@@ -134,15 +134,15 @@ def main():
           '#      sort after filename                #\n'
           '#                                         #\n'
           '###########################################\n')
-    #inp = input('Sort or filename \n')
-    #duplicatesCounter = 1
-    inp = 'sort'
-    if inp == 'sort':
+    location = input('-> Input the complete path of the folder to sort \n')
+    while not os.path.exists(os.path.abspath(location)):
+        location = input('-> Must be a valid path, please try again \n')
+    inp = input('-> Sort or File name ? \n')
+    if inp.lower() == 'sort':
         sortAll()
     else:
-        sort(inp)
+        sortInp(inp)
     rmAllEmptyFolders()
     print('Done')
-
 
 main()
