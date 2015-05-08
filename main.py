@@ -18,48 +18,61 @@ folderToSortFullPath = os.path.join(homeDir, folderToSort)
 recyPath = os.path.join(folderToSortFullPath, '_RecycleBin')
 sortedFilesPath = os.path.join(folderToSortFullPath, '_SortedFiles')
 duplicatesPath = os.path.join(folderToSortFullPath, '_Duplicates')
+musicPath = os.path.join(folderToSortFullPath, '_Music')
 duplicatesCounter = 1
 #globals end
 
-def sort(path, fileName):
+def moveTvShow(regex, path, originalFileName):
     global duplicatesCounter
+    showName = regex.group(1).title()
+    season = regex.group(2)
+    showName = showName.strip()
+    showFolder = os.path.join(sortedFilesPath, showName)
+    if os.path.exists(showFolder):
+        if not os.path.exists(os.path.join(showFolder, 'Season %s'% season)):
+            os.makedirs(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
+    else:
+        #make a new folder and add the show to it in the right season
+        os.makedirs(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
+    if os.path.exists(os.path.join(showFolder, 'Season %s'% season, originalFileName)):
+    # There are two or more files that are called the same they are moved to _Duplicates
+        if os.path.exists(os.path.join(duplicatesPath, originalFileName)):
+            #If there are more then two then the file is removed
+            os.rename(os.path.join(path, originalFileName), os.path.join(path, originalFileName + str(duplicatesCounter)))
+            duplicatesCounter += 1
+        else:
+            shutil.move(os.path.join(path, originalFileName), duplicatesPath)
+    else:
+        shutil.move(os.path.join(path, originalFileName), os.path.join(showFolder, 'Season %s'% season))
+
+def sort(path, fileName):
     originalFileName = fileName
     if fileName.endswith('.avi') \
             or fileName.endswith('.mp4') \
-            or fileName.endswith('.mkv'):
+            or fileName.endswith('.mkv') :
         fileName = fileName.replace('.avi', ' ').replace('.rm', ' ').replace('.srt', ' ').replace('.mp4', ' ')\
             .replace('.mkv', ' ').replace('.', ' ').lower().replace('sample', ' ').replace('-', '').replace('_',' ').strip()
         regex = re.search((r'([\w\s]+)s(\d+)\s*e\d+'), fileName)
-        if regex: # TV shows with the regex 'TV Show Name s\d+ e\d+*'
-            showName = regex.group(1)
-            season = regex.group(2)
-            showName.title()
-            showName = showName.strip()
-            showFolder = os.path.join(sortedFilesPath, showName)
-            if os.path.exists(showFolder):
-                if not os.path.exists(os.path.join(showFolder, 'Season %s'% season)):
-                    os.makedirs(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
-            else:
-                #make a new folder and add the show to it in the right season
-                os.makedirs(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
-            if os.path.exists(os.path.join(showFolder, 'Season %s'% season, originalFileName)):
-            # There are two or more files that are called the same they are moved to _Duplicates
-                if os.path.exists(os.path.join(duplicatesPath, originalFileName)):
-                    #If there are more then two then the file is removed
-                    os.rename(os.path.join(path, originalFileName), os.path.join(path, originalFileName + str(duplicatesCounter)))
-                    duplicatesCounter += 1
-                else:
-                    shutil.move(os.path.join(path, originalFileName), duplicatesPath)
-            else:
-                shutil.move(os.path.join(path, originalFileName), os.path.join(showFolder, 'Season %s'% season))
+        if regex: # TV shows with the regex 'TV Show Name s10 e10'
+            moveTvShow(regex, path, originalFileName)
         else:
-            regex = re.search((r'([\w\s]+) (\d+)\s*'), fileName)
-            if regex:
-                print('newRegex matches the file: ', fileName)
-            else: print('regex did not find anything for the file:', fileName)
-
-def sortTv(showName):
-    pass
+            regex = re.search((r'([\w\s]+).*(\d+)x\d+'), fileName)
+            if regex:# TV shows with the regex 'TV Show Name [10x10]'
+                moveTvShow(regex, path, originalFileName)
+            else:
+                regex = re.search((r'([\w\s]+)\s+(\d)\d\d\s*'), fileName)
+                if regex:
+                    moveTvShow(regex, path, originalFileName)
+                else:
+                    regex = re.search((r'([\w\s]+)\s+s(\d+)\s*e'), fileName)
+                    if regex:
+                        moveTvShow(regex, path, originalFileName)
+                    else:
+                        regex = re.search((r'([\w\s]+)\s+season\s*(\w+)\s*episode'), fileName)
+                        if regex:
+                            moveTvShow(regex, path, originalFileName)
+                        else:
+                            print('regex did not find anything for the file:', fileName)
 
 def sortAll():
     #making _RecycleBin folder and the _SortedFiles folder and the _Duplicates folder
@@ -69,13 +82,19 @@ def sortAll():
         os.mkdir(sortedFilesPath)
     if not os.path.exists(duplicatesPath):
         os.mkdir(duplicatesPath)
+    if not os.path.exists(musicPath):
+        os.mkdir(musicPath)
     #putting files we don't want in the _RecycleBin folder
     for root, dir, files in os.walk(folderToSortFullPath):
-        if root.startswith(sortedFilesPath) or root.startswith(recyPath) or root.startswith(duplicatesPath):
+        #we don't want to sort files that we already sorted
+        if root.startswith(sortedFilesPath) or root.startswith(recyPath) \
+                or root.startswith(duplicatesPath) \
+                or root.startswith(musicPath):
             continue
-        print(dir)
         for file in files:
-            if file.endswith('.mp4') or file.endswith('.avi') \
+            if file.endswith('.mp3'):
+                shutil.move(os.path.join(root, file), os.path.join(musicPath, file))
+            elif file.endswith('.mp4') or file.endswith('.avi') \
                     or file.endswith('.mkv') or file.endswith('.srt') \
                     or file.endswith('.rm') \
                     or file.endswith('.wmv') \
@@ -87,10 +106,21 @@ def sortAll():
 
     #sorting files we want and putting them in the _SortedFiles folder
     for root, dir, files in os.walk(folderToSortFullPath):
-        if root.startswith(sortedFilesPath) or root.startswith(recyPath):
+        if root.startswith(sortedFilesPath) or root.startswith(recyPath) or root.startswith(musicPath)\
+                or root.startswith(duplicatesPath):
             continue
         for file in files:
             sort(root, file)
+
+#Removes all empty Folders
+def rmAllEmptyFolders():
+    for root, dir, files in os.walk(folderToSortFullPath, topdown=False):
+        if root.startswith(sortedFilesPath) or root.startswith(recyPath) or root.startswith(musicPath)\
+                or root.startswith(duplicatesPath):
+            continue
+        else:
+            if not os.listdir(root):
+                os.rmdir(root)
 
 def main():
     print('###########################################\n'
@@ -111,6 +141,7 @@ def main():
         sortAll()
     else:
         sort(inp)
+    rmAllEmptyFolders()
     print('Done')
 
 
