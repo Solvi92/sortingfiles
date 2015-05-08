@@ -12,13 +12,11 @@ import os
 import shutil
 
 #globals
-homeDir = os.getcwd()
-folderToSort = 'downloads'
-folderToSortFullPath = os.path.join(homeDir, folderToSort)
-recyPath = os.path.join(folderToSortFullPath, '_RecycleBin')
-sortedFilesPath = os.path.join(folderToSortFullPath, '_SortedFiles')
-duplicatesPath = os.path.join(folderToSortFullPath, '_Duplicates')
-musicPath = os.path.join(folderToSortFullPath, '_Music')
+folderToSortFullPath = ''
+recyPath = ''
+sortedFilesPath = ''
+duplicatesPath = ''
+musicPath = ''
 duplicatesCounter = 1
 #globals end
 
@@ -38,6 +36,8 @@ def moveTvShow(regex, path, originalFileName):
         os.makedirs(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
     if os.path.exists(os.path.join(showFolder, 'Season %s'% season, originalFileName)):
     # There are two or more files that are called the same, they are moved to _Duplicates
+        if not os.path.exists(duplicatesPath):
+            os.mkdir(duplicatesPath)
         if os.path.exists(os.path.join(duplicatesPath, originalFileName)):
             #If there are more then two then the file is removed
             os.rename(os.path.join(path, originalFileName), os.path.join(path, str(duplicatesCounter) + originalFileName))
@@ -76,6 +76,11 @@ def sort(path, fileName):
                             moveTvShow(regex, path, originalFileName)
 
 def sortAll():
+    #make the recycle bin folder and the music folder
+    if not os.path.exists(recyPath):
+            os.mkdir(recyPath)
+    if not os.path.exists(musicPath):
+        os.mkdir(musicPath)
     #putting files we don't want in the _RecycleBin folder
     for root, dir, files in os.walk(folderToSortFullPath):
         #we don't want to sort files that we already sorted
@@ -124,14 +129,14 @@ def moveShowToFolder(originalFileName, path, regex, inp):
         season = str(season)[1:]
     if os.path.exists(showFolder):
         if not os.path.exists(os.path.join(showFolder, 'Season %s'% season)):
-            print(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
             os.makedirs(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
     else:
         #make a new folder and add the show to it in the right season
-        print(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
         os.makedirs(os.path.join(sortedFilesPath, showName, 'Season %s'% season))
     if os.path.exists(os.path.join(showFolder, 'Season %s'% season, originalFileName)):
     # There are two or more files that are called the same, they are moved to _Duplicates
+        if not os.path.exists(duplicatesPath):
+            os.mkdir(duplicatesPath)
         if os.path.exists(os.path.join(duplicatesPath, originalFileName)):
             #If there are more then two files, then the file is removed
             os.rename(os.path.join(path, originalFileName), os.path.join(path, originalFileName + str(duplicatesCounter)))
@@ -192,27 +197,38 @@ def main():
           '#      sort after filename                #\n'
           '#                                         #\n'
           '###########################################\n')
+    #init globals
+    global folderToSortFullPath
+    global recyPath
+    global sortedFilesPath
+    global duplicatesPath
+    global musicPath
 
-    location = input('-> Input the complete path of the folder to sort \n')
-    while not os.path.exists(os.path.abspath(location)):
-        location = input('-> Must be a valid path, please try again \n')
-    inp = input('-> Sort or File name ? \n')
+    location = 1
+    while location != 0:
+        location = input('-> Input the complete path of the folder to sort or 0 to quit \n')
+        while not os.path.exists(os.path.abspath(location)):
+            location = input('-> Must be a valid path, please try again \n')
 
-    #making _RecycleBin folder and the _SortedFiles folder and the _Duplicates folder
-    if not os.path.exists(recyPath):
-        os.mkdir(recyPath)
-    if not os.path.exists(sortedFilesPath):
-        os.mkdir(sortedFilesPath)
-    if not os.path.exists(duplicatesPath):
-        os.mkdir(duplicatesPath)
-    if not os.path.exists(musicPath):
-        os.mkdir(musicPath)
+        folderToSortFullPath = location
+        recyPath = os.path.join(folderToSortFullPath, '_RecycleBin')
+        sortedFilesPath = os.path.join(folderToSortFullPath, '_SortedFiles')
+        duplicatesPath = os.path.join(folderToSortFullPath, '_Duplicates')
+        musicPath = os.path.join(folderToSortFullPath, '_Music')
 
-    if inp.lower() == 'sort':
-        sortAll()
-    else:
-        sortInp(inp)
-    rmAllEmptyFolders()
-    print('Done')
+        inp = input('-> Sort or File name ? \n')
+
+        #making _SortedFiles
+        if not os.path.exists(sortedFilesPath):
+            os.mkdir(sortedFilesPath)
+
+        if inp.lower() == 'sort':
+            print('......sorting.......')
+            sortAll()
+        else:
+            print('......sorting.......')
+            sortInp(inp)
+        rmAllEmptyFolders()
+        print('Sorting done')
 
 main()
