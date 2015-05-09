@@ -199,17 +199,17 @@ def sortInp(inp):
                                         moveShowToFolder(originalFileName, root, regex, inp)
 
 def main():
-    print('###########################################\n'
-          '#                                         #\n'
-          '#      Welcome to Super Sorter 3000       #\n'
-          '#                                         #\n'
-          '#      Available function:                #\n'
-          '#      Write \'sort\' to sort all files     #\n'
-          '#                                         #\n'
-          '#      Write the \'File name\'  to          #\n'
-          '#      sort after filename                #\n'
-          '#                                         #\n'
-          '###########################################\n')
+    print('   ###########################################\n'
+          '   #                                         #\n'
+          '   #      Welcome to Super Sorter 3000       #\n'
+          '   #                                         #\n'
+          '   #      Available function:                #\n'
+          '   #      Write \'sort\' to sort all files     #\n'
+          '   #                                         #\n'
+          '   #      Write the \'File name\'  to          #\n'
+          '   #      sort after filename                #\n'
+          '   #                                         #\n'
+          '   ###########################################\n')
     #init globals
     global folderToSortFullPath
     global recyPath
