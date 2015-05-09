@@ -253,16 +253,15 @@ def main():
     global musicPath
 
     superSorter = 1
+    location = input('-> Input the complete path of the folder to sort\n')
+    while not os.path.exists(os.path.abspath(location)):
+        location = input('-> Must be a valid path, please try again \n')
+    folderToSortFullPath = location
+    recyPath = os.path.join(folderToSortFullPath, '_RecycleBin')
+    sortedFilesPath = os.path.join(folderToSortFullPath, '_SortedFiles')
+    duplicatesPath = os.path.join(folderToSortFullPath, '_Duplicates')
+    musicPath = os.path.join(folderToSortFullPath, '_Music')
     while superSorter != 0:
-        location = input('-> Input the complete path of the folder to sort\n')
-        while not os.path.exists(os.path.abspath(location)):
-            location = input('-> Must be a valid path, please try again \n')
-        folderToSortFullPath = location
-        recyPath = os.path.join(folderToSortFullPath, '_RecycleBin')
-        sortedFilesPath = os.path.join(folderToSortFullPath, '_SortedFiles')
-        duplicatesPath = os.path.join(folderToSortFullPath, '_Duplicates')
-        musicPath = os.path.join(folderToSortFullPath, '_Music')
-
         inp = input('-> Sort or File name ? \n')
 
         #making _SortedFiles
