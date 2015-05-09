@@ -39,8 +39,10 @@ def moveTvShow(regex, path, originalFileName):
         if not os.path.exists(duplicatesPath):
             os.mkdir(duplicatesPath)
         if os.path.exists(os.path.join(duplicatesPath, originalFileName)):
-            #If there are more then two then the file is removed
-            os.rename(os.path.join(path, originalFileName), os.path.join(path, str(duplicatesCounter) + originalFileName))
+            #If there are more then two files, then the file is renamed and moved to _Duplicates
+            newname = 'Copy - ' + str(duplicatesCounter) + ' ' + originalFileName
+            os.rename(os.path.join(path, originalFileName), os.path.join(path, newname))
+            shutil.move(os.path.join(path, newname), duplicatesPath)
             duplicatesCounter += 1
         else:
             shutil.move(os.path.join(path, originalFileName), duplicatesPath)
@@ -57,7 +59,8 @@ def sort(path, fileName):
             or fileName.endswith('mpg') \
             or fileName.endswith('divx') \
             or fileName.endswith('m4v'):
-        fileName = fileName.replace('.avi', ' ').replace('.rm', ' ').replace('.mpg', ' ').replace('.m4v', ' ').replace('.divx', ' ').replace('.srt', ' ').replace('.mp4', ' ')\
+        fileName = fileName.replace('.avi', ' ').replace('.rm', ' ').replace('.mpg', ' ')\
+            .replace('.m4v', ' ').replace('.divx', ' ').replace('.srt', ' ').replace('.mp4', ' ')\
             .replace('.mkv', ' ').replace('.', ' ').lower().replace('sample', ' ').replace('-', '')\
             .replace('_',' ').replace('\'', '').strip()
         regex = re.search((r'([\w\s]+)s(\d+)\s*e\d+'), fileName)
@@ -97,7 +100,8 @@ def sortAll():
             if file.endswith('.mp3'):
                 shutil.move(os.path.join(root, file), os.path.join(musicPath, file))
             elif file.endswith('.mp4') or file.endswith('.avi') \
-                    or file.endswith('.mkv') or file.endswith('.srt') \
+                    or file.endswith('.mkv') \
+                    or file.endswith('.srt') \
                     or file.endswith('.rm') \
                     or file.endswith('.wmv') \
                     or file.endswith('.py') \
@@ -146,13 +150,39 @@ def moveShowToFolder(originalFileName, path, regex, inp):
         if not os.path.exists(duplicatesPath):
             os.mkdir(duplicatesPath)
         if os.path.exists(os.path.join(duplicatesPath, originalFileName)):
-            #If there are more then two files, then the file is removed
-            os.rename(os.path.join(path, originalFileName), os.path.join(path, originalFileName + str(duplicatesCounter)))
+            #If there are more then two files, then the file is renamed and moved to _
+            newname = 'Copy - ' + str(duplicatesCounter) + ' ' + originalFileName
+            os.rename(os.path.join(path, originalFileName), os.path.join(path, newname))
+            shutil.move(os.path.join(path, newname), duplicatesPath)
             duplicatesCounter += 1
         else:
             shutil.move(os.path.join(path, originalFileName), duplicatesPath)
     else:
         shutil.move(os.path.join(path, originalFileName), os.path.join(showFolder, 'Season %s'% season))
+
+#No season found, then the show will go to the parent folder of the seasons
+def showNoSeason(originalFileName, root, inp):
+    global duplicatesCounter
+    showName = inp.title()
+    showName = showName.strip()
+    showFolder = os.path.join(sortedFilesPath, showName)
+    path = root
+    if not os.path.exists(showFolder):
+        os.mkdir(showFolder)
+    if os.path.exists(os.path.join(showFolder, originalFileName)):
+    # There are two or more files that are called the same, they are moved to _Duplicates
+        if not os.path.exists(duplicatesPath):
+            os.mkdir(duplicatesPath)
+        if os.path.exists(os.path.join(duplicatesPath, originalFileName)):
+            #If there are more then two files, then the file is renamed and moved to _Duplicates
+            newname = 'Copy - ' + str(duplicatesCounter) + ' ' + originalFileName
+            os.rename(os.path.join(path, originalFileName), os.path.join(path, newname))
+            shutil.move(os.path.join(path, newname), duplicatesPath)
+            duplicatesCounter += 1
+        else:
+            shutil.move(os.path.join(path, originalFileName), duplicatesPath)
+    else:
+        shutil.move(os.path.join(path, originalFileName), showFolder)
 
 def sortInp(inp):
     inp = str(inp)
@@ -197,6 +227,10 @@ def sortInp(inp):
                                     regex = re.search((r'([\w\s]+)\s+season\s*(\w+)\s*episode'), fileName)
                                     if regex:# TV shows with the regex 'TV Show Name season 10 episode'
                                         moveShowToFolder(originalFileName, root, regex, inp)
+                                    else:
+                                        #no season was found for the show so it it will be put in no season but only
+                                        #in th season name
+                                        showNoSeason(originalFileName, root, inp)
 
 def main():
     print('   ###########################################\n'
@@ -242,7 +276,7 @@ def main():
             sortInp(inp)
         rmAllEmptyFolders()
         print('Sorting done')
-        superSorter = input('Type 0 if you want to quit else type 1 \n')
+        superSorter = input('Type 0 if you want to quit or type 1 to continue \n')
         while superSorter != '1' and superSorter != '0':
             superSorter = input('Wrong input please type 0 if you want to quit or type 1 to continue \n')
         superSorter = int(superSorter)
