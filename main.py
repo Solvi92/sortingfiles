@@ -51,8 +51,13 @@ def sort(path, fileName):
     originalFileName = fileName
     if fileName.endswith('.avi') \
             or fileName.endswith('.mp4') \
-            or fileName.endswith('.mkv') :
-        fileName = fileName.replace('.avi', ' ').replace('.rm', ' ').replace('.srt', ' ').replace('.mp4', ' ')\
+            or fileName.endswith('.mkv') \
+            or fileName.endswith('.srt') \
+            or fileName.endswith('rm') \
+            or fileName.endswith('mpg') \
+            or fileName.endswith('divx') \
+            or fileName.endswith('m4v'):
+        fileName = fileName.replace('.avi', ' ').replace('.rm', ' ').replace('.mpg', ' ').replace('.m4v', ' ').replace('.divx', ' ').replace('.srt', ' ').replace('.mp4', ' ')\
             .replace('.mkv', ' ').replace('.', ' ').lower().replace('sample', ' ').replace('-', '')\
             .replace('_',' ').replace('\'', '').strip()
         regex = re.search((r'([\w\s]+)s(\d+)\s*e\d+'), fileName)
@@ -95,7 +100,10 @@ def sortAll():
                     or file.endswith('.mkv') or file.endswith('.srt') \
                     or file.endswith('.rm') \
                     or file.endswith('.wmv') \
-                    or file.endswith('.py'):
+                    or file.endswith('.py') \
+                    or file.endswith('mpg') \
+                    or file.endswith('divx') \
+                    or file.endswith('m4v'):
                 continue
             else:
                 #This goes to the Recycle Bin folder
@@ -156,10 +164,15 @@ def sortInp(inp):
             originalFileName = fileName
             if fileName.endswith('.avi') \
                 or fileName.endswith('.mp4') \
-                or fileName.endswith('.mkv') :
-                fileName = fileName.replace('.avi', ' ').replace('.rm', ' ').replace('.srt', ' ')\
-                    .replace('.mp4', ' ').replace('.mkv', ' ').replace('.', ' ').lower().replace('sample', ' ')\
-                    .replace('-', '').replace('_',' ').strip()
+                or fileName.endswith('.mkv') \
+                or fileName.endswith('.srt') \
+                or fileName.endswith('rm') \
+                or fileName.endswith('mpg') \
+                or fileName.endswith('divx') \
+                or fileName.endswith('m4v'):
+                fileName = fileName.replace('.avi', ' ').replace('.rm', ' ').replace('.mpg', ' ').replace('.m4v', ' ').replace('.divx', ' ').replace('.srt', ' ').replace('.mp4', ' ')\
+                    .replace('.mkv', ' ').replace('.', ' ').lower().replace('sample', ' ').replace('-', '')\
+                    .replace('_',' ').replace('\'', '').strip()
                 inp = inp.lower()
                 regex = re.search('.*%s.*'% inp, fileName)
                 if regex:
