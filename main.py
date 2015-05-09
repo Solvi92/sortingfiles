@@ -244,6 +244,7 @@ def main():
           '   #      sort after filename                #\n'
           '   #                                         #\n'
           '   ###########################################\n')
+	
     #init globals
     global folderToSortFullPath
     global recyPath
