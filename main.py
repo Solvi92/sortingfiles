@@ -123,6 +123,7 @@ def sortAll():
 
 #Removes all empty Folders
 def rmAllEmptyFolders():
+    print('-> Removing Empty Folders..')
     for root, dir, files in os.walk(folderToSortFullPath, topdown=False):
         if root.startswith(sortedFilesPath) or root.startswith(recyPath) or root.startswith(musicPath)\
                 or root.startswith(duplicatesPath):
@@ -269,13 +270,13 @@ def main():
             os.mkdir(sortedFilesPath)
 
         if inp.lower() == 'sort':
-            print('......sorting.......')
+            print('-> Sorting..')
             sortAll()
         else:
-            print('......sorting.......')
+            print('-> Sorting..')
             sortInp(inp)
         rmAllEmptyFolders()
-        print('Sorting done')
+        print('-> Sorting done.')
         superSorter = input('Type 0 if you want to quit or type 1 to continue \n')
         while superSorter != '1' and superSorter != '0':
             superSorter = input('Wrong input please type 0 if you want to quit or type 1 to continue \n')
