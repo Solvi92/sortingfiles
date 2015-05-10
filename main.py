@@ -84,6 +84,7 @@ def sort(path, fileName):
                             moveTvShow(regex, path, originalFileName)
 
 def sortAll():
+    global duplicatesCounter
     #make the recycle bin folder and the music folder
     if not os.path.exists(recyPath):
             os.mkdir(recyPath)
@@ -98,7 +99,16 @@ def sortAll():
             continue
         for file in files:
             if file.endswith('.mp3'):
-                shutil.move(os.path.join(root, file), os.path.join(musicPath, file))
+                if os.path.exists(os.path.join(musicPath, file)):
+                    #If there are more then two files, then the file is renamed and moved to _Music
+                    newname = 'Copy - ' + str(duplicatesCounter) + ' ' + file
+                    os.rename(os.path.join(root, file), os.path.join(root, newname))
+                    shutil.move(os.path.join(root, newname), musicPath)
+                    duplicatesCounter += 1
+                else:
+                    shutil.move(os.path.join(root, file), os.path.join(musicPath, file))
+            elif file.endswith('.db'):
+                os.remove(os.path.join(root, file))
             elif file.endswith('.mp4') or file.endswith('.avi') \
                     or file.endswith('.mkv') \
                     or file.endswith('.srt') \
@@ -107,11 +117,19 @@ def sortAll():
                     or file.endswith('.py') \
                     or file.endswith('mpg') \
                     or file.endswith('divx') \
-                    or file.endswith('m4v'):
+                    or file.endswith('m4v') \
+                    or file.endswith('.db'):
                 continue
             else:
                 #This goes to the Recycle Bin folder
-                shutil.move(os.path.join(root, file), os.path.join(recyPath, file))
+                if os.path.exists(os.path.join(recyPath, file)):
+                    #If there are more then two files, then the file is renamed and moved to _RecycleBin
+                    newname = 'Copy - ' + str(duplicatesCounter) + ' ' + file
+                    os.rename(os.path.join(root, file), os.path.join(root, newname))
+                    shutil.move(os.path.join(root, newname), recyPath)
+                    duplicatesCounter += 1
+                else:
+                    shutil.move(os.path.join(root, file), os.path.join(recyPath, file))
 
     #sorting files we want and putting them in the _SortedFiles folder
     for root, dir, files in os.walk(folderToSortFullPath):
@@ -193,6 +211,8 @@ def sortInp(inp):
             continue
         for fileName in files:
             originalFileName = fileName
+            if fileName.endswith('.db'):
+                os.remove(os.path.join(root, fileName))
             if fileName.endswith('.avi') \
                 or fileName.endswith('.mp4') \
                 or fileName.endswith('.mkv') \
